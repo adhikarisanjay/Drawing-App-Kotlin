@@ -24,7 +24,14 @@ import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.Dispatchers.Main
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import yuku.ambilwarna.AmbilWarnaDialog
 import yuku.ambilwarna.AmbilWarnaDialog.OnAmbilWarnaListener
 import java.io.File
@@ -51,6 +58,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             result ->
             findViewById<ImageView>(R.id.gallery_image).setImageURI(result.data?.data)
         }
+
     val requestPermission: ActivityResultLauncher<Array<String>> = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()){ premissions ->
         premissions.entries.forEach{
             val permissionName=  it.key
@@ -61,7 +69,15 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                 val pickIntent=Intent(Intent.ACTION_PICK,MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
                 openGalleryLauncher.launch(pickIntent)
 
-            }else{
+            }
+
+
+        else if(isGranted && (permissionName == Manifest.permission.WRITE_EXTERNAL_STORAGE)){
+            CoroutineScope(IO).launch {
+                saveImage(getBitMapFromView(findViewById(R.id.constraint_l3)))
+
+            }
+        }else{
                 if (permissionName == android.Manifest.permission.READ_EXTERNAL_STORAGE){
                     Toast.makeText(this,"Permission denied",Toast.LENGTH_SHORT).show()
                 }
@@ -87,8 +103,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         drawingView = findViewById(R.id.drawingView)
         drawingView.changeBrushSize(23.toFloat())
         saveButton = findViewById(R.id.button_save)
-
-
 
         brushButton.setOnClickListener{
             showBrusChooserDialog()
@@ -165,10 +179,19 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                     openGalleryLauncher.launch(pickIntent)
                 }
 
-
             }
             R.id.button_save->{
                 // save image
+                if(ActivityCompat.checkSelfPermission(this,Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+                    requestStoragePermission()
+                }else{
+                    val layout = findViewById<ConstraintLayout>(R.id.constraint_l3)
+                    val bitmap = getBitMapFromView(layout)
+                    CoroutineScope(IO).launch {
+                        saveImage(bitmap)
+
+                    }
+                }
 
 
             }
@@ -191,7 +214,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         if(ActivityCompat.shouldShowRequestPermissionRationale(this,android.Manifest.permission.READ_EXTERNAL_STORAGE)){
             showRationalDialog()
         }else{
-            requestPermission.launch(arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE))
+            requestPermission.launch(arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE))
+
         }
     }
 
@@ -200,8 +224,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         builder.setTitle("Storage Permission").setMessage("we need this permission in order to  access the internal storage"
         ).setPositiveButton(R.string.dialog_yes){
             dialog, _ ->
-            requestPermission.launch(arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE))
-
+            requestPermission.launch(arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE))
             dialog.dismiss()
         }
         builder.create().show()
@@ -214,23 +237,27 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         return  bitmap
     }
 
-    private  fun saveImage(bitmap:Bitmap){
-        val root =  Environment.getExternalStorageDirectory().toString()
-        val myDir = File("root/saved_images")
+    private suspend fun saveImage(bitmap:Bitmap){
+        val root =  Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).toString()
+        val myDir = File("$root/saved_images")
         myDir.mkdir()
         val generator = Random()
-        var n = 10000
+        var n =10000
+            n= generator.nextInt(n)
         val outputFile =  File(myDir,"Images-$n.jpg")
         if (outputFile.exists()){
             outputFile.delete()
         }else{
             try {
-                    val out = FileOutputStream(outputFile)
+                val out = FileOutputStream(outputFile)
                 bitmap.compress(Bitmap.CompressFormat.JPEG,90,out)
                 out.flush()
                 out.close()
             }catch (e:Exception){
-
+            e.stackTrace
+            }
+            withContext(Main){
+                Toast.makeText(this@MainActivity, "${outputFile.absolutePath} saved", Toast.LENGTH_SHORT).show()
             }
         }
     }

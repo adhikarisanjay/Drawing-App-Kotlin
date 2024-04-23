@@ -1,13 +1,16 @@
-# Drawing-App-Kotlin
+**Initial View of the Application:**
 
-Initial view of application
-![Screenshot_1713904027](https://github.com/adhikarisanjay/Drawing-App-Kotlin/assets/35997281/5ab89a3b-c512-470a-a474-6e60ac8b182c)
-User can select image and draw over it or they can draw over white background
-![Screenshot_1713904230](https://github.com/adhikarisanjay/Drawing-App-Kotlin/assets/35997281/aac67d0a-6f34-4e52-b107-ca040bf6b595)
-User can choose brush size
-![Screenshot_1713904502](https://github.com/adhikarisanjay/Drawing-App-Kotlin/assets/35997281/c02ed5a8-cdfe-41c5-8a12-22121d11a340)
+<img src="https://github.com/adhikarisanjay/Drawing-App-Kotlin/assets/35997281/2add48e2-ee50-4d86-962d-a6838cd7006f" width="400">
 
-Color picker 
-https://github.com/yukuku/ambilwarna  
-![Screenshot_1713904649](https://github.com/adhikarisanjay/Drawing-App-Kotlin/assets/35997281/1ff41716-b8b7-4213-881c-4b312981f37e)
+Users can select an image and draw over it or choose to draw over a white background.
 
+<img src="https://github.com/adhikarisanjay/Drawing-App-Kotlin/assets/35997281/e503b4f0-88d2-40f6-8104-dfe25c233c89" width="400">
+
+Users have the option to adjust the brush size according to their preference.
+
+<img src="https://github.com/adhikarisanjay/Drawing-App-Kotlin/assets/35997281/9fafc3d5-3787-4387-a359-21f93740dfb1)" width="400">
+
+For selecting colors, the application utilizes the AmbilWarna color picker library.
+https://github.com/yukuku/ambilwarna
+
+<img src="https://github.com/adhikarisanjay/Drawing-App-Kotlin/assets/35997281/0f4187fc-2bf3-4e27-a2ad-df1cad96d250" width="400">

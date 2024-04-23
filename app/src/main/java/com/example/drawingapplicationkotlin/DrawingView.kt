@@ -38,13 +38,15 @@ class DrawingView(context: Context,attrs:AttributeSet):View(context,attrs) {
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         canvas.drawBitmap(canvasBitmap,0f,0f,drawPaint)
+
+
         for (path in paths)
         {
-                drawPaint.strokeWidth = path.brushThickness
+            drawPaint.strokeWidth = path.brushThickness
                 drawPaint.color = path.color
                 canvas.drawPath(path,drawPaint)// drawing path on canvas
         }
-        if(!drawPath.isEmpty){
+        if(!drawPath.isEmpty || paths.size==1){
             drawPaint.strokeWidth = drawPath.brushThickness
             drawPaint.color = drawPath.color
             canvas.drawPath(drawPath,drawPaint)// drawing path on canvas
@@ -59,6 +61,8 @@ class DrawingView(context: Context,attrs:AttributeSet):View(context,attrs) {
         when(event?.action) {
             // this event will be fired when the user put finger on the screen
             MotionEvent.ACTION_DOWN -> {
+                drawPath = FingerPath(color, brushSize)
+
                 drawPath.color = color
                 drawPath.brushThickness = brushSize.toFloat()
 
@@ -72,8 +76,9 @@ class DrawingView(context: Context,attrs:AttributeSet):View(context,attrs) {
             }
             //this event will be fired when the user will picks up the finger from screen
             MotionEvent.ACTION_UP -> {
-                drawPath = FingerPath(color, brushSize)
                 paths.add(drawPath)
+                println("this will check it path ${paths.size}")
+
             }
             else -> return false
         }
@@ -114,10 +119,16 @@ class DrawingView(context: Context,attrs:AttributeSet):View(context,attrs) {
     }
 
     fun  undoPath(){
+        println("size of path for undo${paths.size}")
         if(paths.size>0){
             paths.removeAt(paths.size-1)
+            drawPath.reset()
+
+            println("size of path for undo${paths.size}")
+
             invalidate() // refreshing the layout to the reflect the drawing changes
         }
+        drawPath.reset()
     }
 
     internal inner  class FingerPath(var color: Int, var brushThickness: Float):Path()

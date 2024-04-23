@@ -59,6 +59,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             findViewById<ImageView>(R.id.gallery_image).setImageURI(result.data?.data)
         }
 
+    //asking permission from user to read and write
     val requestPermission: ActivityResultLauncher<Array<String>> = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()){ premissions ->
         premissions.entries.forEach{
             val permissionName=  it.key
@@ -136,7 +137,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             }
 
             override fun onStopTrackingTouch(p0: SeekBar?) {
-
             }
 
 
@@ -202,13 +202,11 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         override fun onCancel(dialog: AmbilWarnaDialog?) {
 
         }
-
         override fun onOk(dialog: AmbilWarnaDialog?, color: Int) {
             drawingView.setColor(color)
         }
     })
         dialog.show()
-
     }
     private  fun requestStoragePermission(){
         if(ActivityCompat.shouldShowRequestPermissionRationale(this,android.Manifest.permission.READ_EXTERNAL_STORAGE)){

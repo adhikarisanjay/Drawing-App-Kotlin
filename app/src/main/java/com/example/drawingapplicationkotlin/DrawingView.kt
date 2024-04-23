@@ -95,7 +95,7 @@ class DrawingView(context: Context,attrs:AttributeSet):View(context,attrs) {
         drawPaint.strokeJoin = Paint.Join.ROUND
 
         canvasPaint = Paint(Paint.DITHER_FLAG)
-        brushSize = 20.toFloat()
+        brushSize = 10.toFloat()
 
 
     }
